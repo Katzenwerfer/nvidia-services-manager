@@ -3,7 +3,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 $TaskName = 'NvContainerLocalSystem Killer (NVIDIA App.exe)'
 $TaskPath = '\Custom\'
 
-$ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+$ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction 'SilentlyContinue'
 if (-not $ScheduledTask) {
     Write-Host -Object 'Could not find the scheduled task.' -ForegroundColor 'Yellow'
     Write-Host -Object 'Generating a new one...' -ForegroundColor 'Cyan'
