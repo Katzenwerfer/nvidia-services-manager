@@ -1,30 +1,25 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$ServiceNames = @(
-    'NvContainerLocalSystem',
-    'NVDisplay.ContainerLocalSystem'
-)
+$TaskNameWildcard = 'NVIDIA App*'
 
-foreach ($ServiceName in $ServiceNames) {
-    $Service = Get-Service -Name $ServiceName
+$Task = Get-ScheduledTask -TaskName $TaskNameWildcard
 
-    if (-not $Service) {
-        Write-Error -Message "Service '$ServiceName' was not found on this system." -ErrorAction 'Stop'
+if (-not $Task) {
+    Write-Error -Message 'Scheduled task could not found on this system.' -ErrorAction 'Stop'
+}
+
+if ($Task.State -ne 'Disabled') {
+    Write-Host -Object "Scheduled task is currently set to '$($Task.State)'." -ForegroundColor 'Yellow'
+    Write-Host -Object "Changing state to 'Disabled'..." -ForegroundColor 'Cyan'
+
+    try {
+        Disable-ScheduledTask -TaskName $Task.TaskName -ErrorAction 'Stop' | Out-Null
+        Write-Host -Object "Successfully changed state to 'Disabled'." -ForegroundColor 'Green'
     }
-
-    if ($Service.StartType -ne 'Manual') {
-        Write-Host -Object "'$ServiceName' start type is currently set to '$($Service.StartType)'." -ForegroundColor 'Yellow'
-        Write-Host -Object "Changing start type to 'Manual'..." -ForegroundColor 'Cyan'
-
-        try {
-            Set-Service -Name $ServiceName -StartupType 'Manual' -ErrorAction 'Stop'
-            Write-Host -Object "Successfully changed start type to 'Manual'." -ForegroundColor 'Green'
-        }
-        catch {
-            Write-Error 'Failed to update the service. Make sure you are running as Administrator.' -ErrorAction 'Stop'
-        }
+    catch {
+        Write-Error -Message 'Failed to change scheduled task state. Make sure you are running as Administrator.' -ErrorAction 'Stop'
     }
-    else {
-        Write-Host -Object "Service '$ServiceName' start type is currently  set to 'Manual'. No change required." -ForegroundColor 'Green'
-    }
+}
+else {
+    Write-Host -Object "Scheduled task state is currently set to 'Disabled'. No action taken." -ForegroundColor 'Green'
 }
