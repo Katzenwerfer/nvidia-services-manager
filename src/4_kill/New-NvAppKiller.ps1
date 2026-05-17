@@ -3,36 +3,41 @@ $ErrorActionPreference = 'SilentlyContinue'
 $TaskName = 'NvContainerLocalSystem Killer (NVIDIA App.exe)'
 $TaskPath = '\Custom\'
 
-# --------------------------------
-# === Scheduled Task Principal ===
-# --------------------------------
+$ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+if (-not $ScheduledTask) {
+    Write-Host -Object 'Could not find the scheduled task.' -ForegroundColor 'Yellow'
+    Write-Host -Object 'Generating a new one...' -ForegroundColor 'Cyan'
 
-$UserId = "$env:USERDOMAIN\$env:USERNAME"
+    # --------------------------------
+    # === Scheduled Task Principal ===
+    # --------------------------------
 
-$ScheduledTaskPrincipal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType 'S4U'
+    $UserId = "$env:USERDOMAIN\$env:USERNAME"
 
-# -----------------------------
-# === Scheduled Task Action ===
-# -----------------------------
+    $ScheduledTaskPrincipal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType 'S4U'
 
-$ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
-$ActionScript = "$PSScriptRoot\Stop-NvContainerLS.ps1"
-$ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
+    # -----------------------------
+    # === Scheduled Task Action ===
+    # -----------------------------
 
-$ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters
+    $ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
+    $ActionScript = "$PSScriptRoot\Stop-NvContainerLS.ps1"
+    $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
-# -------------------------------
-# === Scheduled Task Settings ===
-# -------------------------------
+    $ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters
 
-$ScheduledTaskSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -StartWhenAvailable -DontStopIfGoingOnBatteries -MultipleInstances 'IgnoreNew'
+    # -------------------------------
+    # === Scheduled Task Settings ===
+    # -------------------------------
 
-# ------------------------------
-# === Scheduled Task Trigger ===
-# ------------------------------
+    $ScheduledTaskSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -StartWhenAvailable -DontStopIfGoingOnBatteries -MultipleInstances 'IgnoreNew'
 
-$TargetProcess = 'C:\Program Files\NVIDIA Corporation\NVIDIA App\CEF\NVIDIA App.exe'
-$TargetQuery = @"
+    # ------------------------------
+    # === Scheduled Task Trigger ===
+    # ------------------------------
+
+    $TargetProcess = 'C:\Program Files\NVIDIA Corporation\NVIDIA App\CEF\NVIDIA App.exe'
+    $TargetQuery = @"
 <QueryList>
     <Query Id="0" Path="Security">
         <Select Path="Security">
@@ -46,11 +51,15 @@ $TargetQuery = @"
 </QueryList>
 "@
 
-$ScheduledTaskTrigger = Get-CimClass -ClassName 'MSFT_TaskEventTrigger' -Namespace 'Root/Microsoft/Windows/TaskScheduler' | New-CimInstance -ClientOnly
-$ScheduledTaskTrigger.Subscription = $TargetQuery
+    $ScheduledTaskTrigger = Get-CimClass -ClassName 'MSFT_TaskEventTrigger' -Namespace 'Root/Microsoft/Windows/TaskScheduler' | New-CimInstance -ClientOnly
+    $ScheduledTaskTrigger.Subscription = $TargetQuery
 
-# ----------------------
-# === Scheduled Task ===
-# ----------------------
+    # ----------------------
+    # === Scheduled Task ===
+    # ----------------------
 
-New-ScheduledTask -Action $ScheduledTaskAction -Principal $ScheduledTaskPrincipal -Settings $ScheduledTaskSettings -Trigger $ScheduledTaskTrigger | Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+    New-ScheduledTask -Action $ScheduledTaskAction -Principal $ScheduledTaskPrincipal -Settings $ScheduledTaskSettings -Trigger $ScheduledTaskTrigger | Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+}
+else {
+    Write-Host -Object 'Scheduled task already exists. No action taken.' -ForegroundColor 'Green'
+}
