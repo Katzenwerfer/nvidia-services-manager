@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$TaskName = 'NvDisplayContainerLocalSystem Killer (nvcplui.exe)'
+$TaskName = 'NvDisplayContainerLocalSystem Spawner (nvcplui.exe)'
 $TaskPath = '\Custom\'
 
 $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
@@ -9,9 +9,9 @@ if ($ScheduledTask) {
     $TargetProcess = Resolve-Path -Path 'C:\Program Files\WindowsApps\NVIDIACorp.NVIDIAControlPanel_*\nvcplui.exe'
     if ($Matches[1] -eq $TargetProcess) {
         $ScheduledTask | Unregister-ScheduledTask -Confirm:$false
-        & "$PSScriptRoot\..\4_kill\New-NvCplKiller.ps1"
+        & "$PSScriptRoot\..\3_spawn\New-NvCplSpawner.ps1"
     }
 }
 else {
-    & "$PSScriptRoot\..\4_kill\New-NvCplKiller.ps1"
+    & "$PSScriptRoot\..\3_spawn\New-NvCplSpawner.ps1"
 }
