@@ -1,27 +1,22 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$SubcategoryNames = @(
-    'Process Creation',
-    'Process Termination'
+$ServiceNames = @(
+    'NvContainerLocalSystem',
+    'NVDisplay.ContainerLocalSystem'
 )
 
-foreach ($SubcategoryName in $SubcategoryNames) {
-    $Subcategory = & auditpol.exe /get /subcategory:"$SubcategoryName" /r | ConvertFrom-Csv
-    $Status = $Subcategory | Select-Object -ExpandProperty 'Inclusion Setting'
+foreach ($ServiceName in $ServiceNames) {
+    $Service = Get-Service -Name $ServiceName
 
-    if ($Status -notlike '*Success*') {
-        Write-Host -Object "Audit policy '$SubcategoryName' is currently set to $Status." -ForegroundColor 'Yellow'
-        Write-Host -Object "Enabling 'Success' recording..." -ForegroundColor 'Cyan'
+    if ($Service.StartType -ne 'Manual') {
+        Write-Host -Object "'$ServiceName' start type is currently set to '$($Service.StartType)'." -ForegroundColor 'Yellow'
+        Write-Host -Object "Changing start type to 'Manual'..." -ForegroundColor 'Cyan'
 
-        & auditpol.exe /set /subcategory:"$SubcategoryName" /success:enable | Out-Null
+        Set-Service -Name $ServiceName -StartupType 'Manual' -ErrorAction 'Stop'
 
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error -Message "Failed to configure policy for '$SubcategoryName'. Make sure you are running as Administrator." -ErrorAction 'Stop'
-        }
-
-        Write-Host -Object "Successfully updated '$SubcategoryName' to register 'Success' events." -ForegroundColor 'Green'
+        Write-Host -Object "Successfully changed start type to 'Manual'." -ForegroundColor 'Green'
     }
     else {
-        Write-Host -Object "Audit policy '$SubcategoryName' is already set to $Status. No action taken." -ForegroundColor 'Green'
+        Write-Host -Object "Service '$ServiceName' start type is currently  set to 'Manual'. No change required." -ForegroundColor 'Green'
     }
 }
