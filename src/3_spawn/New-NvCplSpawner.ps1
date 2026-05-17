@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$TaskName = 'NvDisplayContainerLocalSystem Killer (nvcplui.exe)'
+$TaskName = 'NvDisplayContainerLocalSystem Spawner (nvcplui.exe)'
 $TaskPath = '\Custom\'
 
 $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
@@ -22,7 +22,7 @@ if (-not $ScheduledTask) {
     # -----------------------------
 
     $ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
-    $ActionScript = "$PSScriptRoot\Stop-NvDisplayContainerLocalSystem.ps1"
+    $ActionScript = "$PSScriptRoot\Start-NvDisplayContainer.ps1"
     $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
     $ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters
@@ -43,9 +43,9 @@ if (-not $ScheduledTask) {
     <Query Id="0" Path="Security">
         <Select Path="Security">
             *[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and
-            (EventID=4689) and
-            (Task=13313)]] and
-            *[EventData[Data[@Name='ProcessName'] and
+            (EventID=4688) and
+            (Task=13312)]] and
+            *[EventData[Data[@Name='NewProcessName'] and
             (Data='$TargetProcess')]]
         </Select>
     </Query>
