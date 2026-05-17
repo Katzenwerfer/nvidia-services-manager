@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$TaskName = 'NvContainerLocalSystem Killer (NVIDIA App.exe)'
+$TaskName = 'NvDisplayContainerLocalSystem Killer (nvcplui.exe)'
 $TaskPath = '\Custom\'
 
 $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
@@ -21,7 +21,7 @@ if (-not $ScheduledTask) {
     # -----------------------------
 
     $ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
-    $ActionScript = "$PSScriptRoot\Stop-NvContainerLS.ps1"
+    $ActionScript = "$PSScriptRoot\Stop-NvDisplayContainer.ps1"
     $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
     $ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters
@@ -36,7 +36,7 @@ if (-not $ScheduledTask) {
     # === Scheduled Task Trigger ===
     # ------------------------------
 
-    $TargetProcess = 'C:\Program Files\NVIDIA Corporation\NVIDIA App\CEF\NVIDIA App.exe'
+    $TargetProcess = Resolve-Path -Path 'C:\Program Files\WindowsApps\NVIDIACorp.NVIDIAControlPanel_*\nvcplui.exe'
     $TargetQuery = @"
 <QueryList>
     <Query Id="0" Path="Security">
