@@ -5,7 +5,7 @@ $TaskPath = '\Custom\'
 
 $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
 if ($ScheduledTask) {
-    $ScheduledTask.Triggers.Subscription -match "Data='(.+)'"
+    $ScheduledTask.Triggers.Subscription -match "Data='(.+)'" | Out-Null
     $TargetProcess = Resolve-Path -Path 'C:\Program Files\WindowsApps\NVIDIACorp.NVIDIAControlPanel_*\nvcplui.exe'
     if ($Matches[1] -ne $TargetProcess) {
         $ScheduledTask | Unregister-ScheduledTask -Confirm:$false
