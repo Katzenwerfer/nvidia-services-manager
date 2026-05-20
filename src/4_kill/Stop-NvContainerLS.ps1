@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 2
 
 if (-not [bool](Get-Process -Name 'NVIDIA App' -ErrorAction 'SilentlyContinue')) {
     Stop-Service -Force -Name 'NvContainerLocalSystem'
