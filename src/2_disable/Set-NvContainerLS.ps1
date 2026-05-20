@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$ServiceName = 'NVDisplay.ContainerLocalSystem'
+$ServiceName = 'NvContainerLocalSystem'
 
 $Service = Get-Service -Name $ServiceName
 
