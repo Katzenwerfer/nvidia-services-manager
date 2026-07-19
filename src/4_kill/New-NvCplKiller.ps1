@@ -55,11 +55,22 @@ if (-not $ScheduledTask) {
     $ScheduledTaskTrigger = Get-CimClass -ClassName 'MSFT_TaskEventTrigger' -Namespace 'Root/Microsoft/Windows/TaskScheduler' | New-CimInstance -ClientOnly
     $ScheduledTaskTrigger.Subscription = $TargetQuery
 
-    # ----------------------
-    # === Scheduled Task ===
-    # ----------------------
+    # -------------------------------
+    # === Scheduled Task Creation ===
+    # -------------------------------
 
-    New-ScheduledTask -Action $ScheduledTaskAction -Principal $ScheduledTaskPrincipal -Settings $ScheduledTaskSettings -Trigger $ScheduledTaskTrigger | Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+    New-ScheduledTask -Action $ScheduledTaskAction -Principal $ScheduledTaskPrincipal -Settings $ScheduledTaskSettings -Trigger $ScheduledTaskTrigger | Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath | Out-Null
+
+    # -----------------------------------
+    # === Scheduled Task Verification ===
+    # -----------------------------------
+
+    $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+    if (-not $ScheduledTask) {
+        Write-Error -Message 'Failed to register scheduled task.' -ErrorAction 'Stop'
+    }
+
+    Write-Host -Object "Successfully created new scheduled task '$TaskPath$TaskName'." -ForegroundColor 'Green'
 }
 else {
     Write-Host -Object 'Scheduled task already exists. No action taken.' -ForegroundColor 'Green'
