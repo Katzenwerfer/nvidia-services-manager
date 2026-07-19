@@ -1,3 +1,6 @@
+. "$PSScriptRoot\0_shared\Test-IsElevated.ps1"
+Test-IsElevated
+
 # Part 1
 
 & "$PSScriptRoot\1_setup\Enable-ProcessTracking.ps1"
