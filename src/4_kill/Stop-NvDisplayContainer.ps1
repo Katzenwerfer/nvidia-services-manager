@@ -2,6 +2,8 @@ $ErrorActionPreference = 'SilentlyContinue'
 
 Start-Sleep -Seconds 2
 
-if (-not [bool](Get-Process -Name 'nvcplui' -ErrorAction 'SilentlyContinue')) {
+$Process = Get-Process -Name 'nvcplui'
+
+if (-not $Process) {
     Stop-Service -Force -Name 'NVDisplay.ContainerLocalSystem'
 }
