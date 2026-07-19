@@ -5,16 +5,20 @@ $SubcategoryNames = @(
     'Process Termination'
 )
 
-foreach ($SubcategoryName in $SubcategoryNames) {
+function Get-SubcategoryStatus {
+    param ([string]$SubcategoryName)
     $Subcategory = & auditpol.exe /get /subcategory:"$SubcategoryName" /r | ConvertFrom-Csv
-    $Status = $Subcategory | Select-Object -ExpandProperty 'Inclusion Setting'
+    return $Subcategory | Select-Object -ExpandProperty 'Inclusion Setting'
+}
+
+foreach ($SubcategoryName in $SubcategoryNames) {
+    $Status = Get-SubcategoryStatus -SubcategoryName $SubcategoryName
     if ($Status -notlike '*Success*') {
         Write-Host -Object "Audit policy '$SubcategoryName' is currently set to $Status." -ForegroundColor 'Yellow'
         Write-Host -Object "Enabling 'Success' recording..." -ForegroundColor 'Cyan'
 
         & auditpol.exe /set /subcategory:"$SubcategoryName" /success:enable | Out-Null
 
-        $Subcategory = & auditpol.exe /get /subcategory:"$SubcategoryName" /r | ConvertFrom-Csv
         $Status = Get-SubcategoryStatus -SubcategoryName $SubcategoryName
         if ($Status -notlike '*Success*') {
             Write-Error -Message "Failed to configure policy for '$SubcategoryName'." -ErrorAction 'Stop'
