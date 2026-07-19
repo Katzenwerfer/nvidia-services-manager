@@ -12,13 +12,14 @@ if ($Task.State -ne 'Disabled') {
     Write-Host -Object "Scheduled task is currently set to '$($Task.State)'." -ForegroundColor 'Yellow'
     Write-Host -Object "Changing state to 'Disabled'..." -ForegroundColor 'Cyan'
 
-    try {
-        Disable-ScheduledTask -TaskName $Task.TaskName -ErrorAction 'Stop' | Out-Null
-        Write-Host -Object "Successfully changed state to 'Disabled'." -ForegroundColor 'Green'
+    Disable-ScheduledTask -TaskName $Task.TaskName -ErrorAction 'Stop' | Out-Null
+
+    $Task = Get-ScheduledTask -TaskName $TaskNameWildcard
+    if ($Task.State -ne 'Disabled') {
+        Write-Error -Message 'Failed to change scheduled task state.' -ErrorAction 'Stop'
     }
-    catch {
-        Write-Error -Message 'Failed to change scheduled task state. Make sure you are running as Administrator.' -ErrorAction 'Stop'
-    }
+
+    Write-Host -Object "Successfully changed state to 'Disabled'." -ForegroundColor 'Green'
 }
 else {
     Write-Host -Object "Scheduled task state is currently set to 'Disabled'. No action taken." -ForegroundColor 'Green'
