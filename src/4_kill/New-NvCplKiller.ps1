@@ -22,7 +22,7 @@ if (-not $ScheduledTask) {
     # -----------------------------
 
     $ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
-    $ActionScript = "$PSScriptRoot\Stop-NvDisplayContainer.ps1"
+    $ActionScript = "$PSScriptRoot\Stop-NvCplServices.ps1"
     $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
     $ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters

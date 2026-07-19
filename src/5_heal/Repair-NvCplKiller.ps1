@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$TaskName = 'NvDisplayContainerLocalSystem Killer (nvcplui.exe)'
+$TaskName = 'NVIDIA Services Killer (NVIDIA App.exe)'
 $TaskPath = '\Custom\NVIDIA\'
 
 $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
