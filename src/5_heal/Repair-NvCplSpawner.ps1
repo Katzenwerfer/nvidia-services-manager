@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
 $TaskName = 'NvDisplayContainerLocalSystem Spawner (nvcplui.exe)'
-$TaskPath = '\Custom\'
+$TaskPath = '\Custom\NVIDIA\'
 
 $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
 
