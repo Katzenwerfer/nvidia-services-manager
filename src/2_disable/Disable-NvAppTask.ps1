@@ -22,5 +22,5 @@ if ($Task.State -ne 'Disabled') {
     Write-Host -Object "Successfully changed state to 'Disabled'." -ForegroundColor 'Green'
 }
 else {
-    Write-Host -Object "Scheduled task state is currently set to 'Disabled'. No action taken." -ForegroundColor 'Green'
+    Write-Host -Object "Scheduled task '$($Task.TaskName)' state is currently set to 'Disabled'. No action taken." -ForegroundColor 'Green'
 }

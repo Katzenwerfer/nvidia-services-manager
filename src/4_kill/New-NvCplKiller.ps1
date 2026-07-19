@@ -73,5 +73,5 @@ if (-not $ScheduledTask) {
     Write-Host -Object "Successfully created new scheduled task '$TaskPath$TaskName'." -ForegroundColor 'Green'
 }
 else {
-    Write-Host -Object 'Scheduled task already exists. No action taken.' -ForegroundColor 'Green'
+    Write-Host -Object "Scheduled task '$TaskPath$TaskName' already exists. No action taken." -ForegroundColor 'Green'
 }
