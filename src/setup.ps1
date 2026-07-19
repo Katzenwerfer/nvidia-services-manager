@@ -13,11 +13,13 @@ Test-IsElevated
 
 # Part 3
 
+& "$PSScriptRoot\3_spawn\New-NvAppSpawner.ps1"
+& "$PSScriptRoot\3_spawn\New-NvCplHelper.ps1"
 & "$PSScriptRoot\3_spawn\New-NvCplSpawner.ps1"
 
 # Part 4
 
 & "$PSScriptRoot\4_kill\New-NvAppKiller.ps1"
 & "$PSScriptRoot\4_kill\New-NvCplKiller.ps1"
-& "$PSScriptRoot\4_kill\Stop-NvContainerLS.ps1"
-& "$PSScriptRoot\4_kill\Stop-NvDisplayContainer.ps1"
+& "$PSScriptRoot\4_kill\Stop-NvAppServices.ps1"
+& "$PSScriptRoot\4_kill\Stop-NvCplServices.ps1"
