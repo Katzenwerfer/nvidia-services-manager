@@ -1,6 +1,11 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-Start-Service -Name 'NVDisplay.ContainerLocalSystem'
+
+$NVDisplayContainerLS = Get-Service -Name 'NVDisplay.ContainerLocalSystem'
+
+if ($NVDisplayContainerLS.Status -ne 'Running') {
+    Start-Service -Name 'NVDisplay.ContainerLocalSystem'
+}
 
 Start-Sleep -Seconds 1
 
