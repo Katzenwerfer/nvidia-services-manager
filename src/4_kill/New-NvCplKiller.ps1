@@ -5,40 +5,44 @@ $TaskPath = '\Custom\NVIDIA\'
 
 $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
 
-if (-not $ScheduledTask) {
-    Write-Host -Object 'Could not find the scheduled task.' -ForegroundColor 'Yellow'
-    Write-Host -Object 'Generating a new one...' -ForegroundColor 'Cyan'
+if ($ScheduledTask) {
+    Write-Host -Object "Scheduled task '$TaskPath$TaskName' already exists. No action taken." -ForegroundColor 'Green'
+    Return
+}
 
-    # --------------------------------
-    # === Scheduled Task Principal ===
-    # --------------------------------
+Write-Host -Object 'Could not find the scheduled task.' -ForegroundColor 'Yellow'
+Write-Host -Object 'Generating a new one...' -ForegroundColor 'Cyan'
 
-    $UserId = "$env:USERDOMAIN\$env:USERNAME"
+# --------------------------------
+# === Scheduled Task Principal ===
+# --------------------------------
 
-    $ScheduledTaskPrincipal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType 'S4U'
+$UserId = "$env:USERDOMAIN\$env:USERNAME"
 
-    # -----------------------------
-    # === Scheduled Task Action ===
-    # -----------------------------
+$ScheduledTaskPrincipal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType 'S4U'
 
-    $ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
-    $ActionScript = "$PSScriptRoot\Stop-NvCplServices.ps1"
-    $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
+# -----------------------------
+# === Scheduled Task Action ===
+# -----------------------------
 
-    $ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters
+$ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
+$ActionScript = "$PSScriptRoot\Stop-NvCplServices.ps1"
+$ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
-    # -------------------------------
-    # === Scheduled Task Settings ===
-    # -------------------------------
+$ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters
 
-    $ScheduledTaskSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -StartWhenAvailable -DontStopIfGoingOnBatteries -MultipleInstances 'IgnoreNew'
+# -------------------------------
+# === Scheduled Task Settings ===
+# -------------------------------
 
-    # ------------------------------
-    # === Scheduled Task Trigger ===
-    # ------------------------------
+$ScheduledTaskSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -StartWhenAvailable -DontStopIfGoingOnBatteries -MultipleInstances 'IgnoreNew'
 
-    $TargetProcess = Resolve-Path -Path 'C:\Program Files\WindowsApps\NVIDIACorp.NVIDIAControlPanel_*\nvcplui.exe'
-    $TargetQuery = @"
+# ------------------------------
+# === Scheduled Task Trigger ===
+# ------------------------------
+
+$TargetProcess = Resolve-Path -Path 'C:\Program Files\WindowsApps\NVIDIACorp.NVIDIAControlPanel_*\nvcplui.exe'
+$TargetQuery = @"
 <QueryList>
     <Query Id="0" Path="Security">
         <Select Path="Security">
@@ -52,26 +56,22 @@ if (-not $ScheduledTask) {
 </QueryList>
 "@
 
-    $ScheduledTaskTrigger = Get-CimClass -ClassName 'MSFT_TaskEventTrigger' -Namespace 'Root/Microsoft/Windows/TaskScheduler' | New-CimInstance -ClientOnly
-    $ScheduledTaskTrigger.Subscription = $TargetQuery
+$ScheduledTaskTrigger = Get-CimClass -ClassName 'MSFT_TaskEventTrigger' -Namespace 'Root/Microsoft/Windows/TaskScheduler' | New-CimInstance -ClientOnly
+$ScheduledTaskTrigger.Subscription = $TargetQuery
 
-    # -------------------------------
-    # === Scheduled Task Creation ===
-    # -------------------------------
+# -------------------------------
+# === Scheduled Task Creation ===
+# -------------------------------
 
-    New-ScheduledTask -Action $ScheduledTaskAction -Principal $ScheduledTaskPrincipal -Settings $ScheduledTaskSettings -Trigger $ScheduledTaskTrigger | Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath | Out-Null
+New-ScheduledTask -Action $ScheduledTaskAction -Principal $ScheduledTaskPrincipal -Settings $ScheduledTaskSettings -Trigger $ScheduledTaskTrigger | Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath | Out-Null
 
-    # -----------------------------------
-    # === Scheduled Task Verification ===
-    # -----------------------------------
+# -----------------------------------
+# === Scheduled Task Verification ===
+# -----------------------------------
 
-    $ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
-    if (-not $ScheduledTask) {
-        Write-Error -Message 'Failed to register scheduled task.' -ErrorAction 'Stop'
-    }
-
-    Write-Host -Object "Successfully created new scheduled task '$TaskPath$TaskName'." -ForegroundColor 'Green'
+$ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+if (-not $ScheduledTask) {
+    Write-Error -Message 'Failed to register scheduled task.' -ErrorAction 'Stop'
 }
-else {
-    Write-Host -Object "Scheduled task '$TaskPath$TaskName' already exists. No action taken." -ForegroundColor 'Green'
-}
+
+Write-Host -Object "Successfully created new scheduled task '$TaskPath$TaskName'." -ForegroundColor 'Green'
