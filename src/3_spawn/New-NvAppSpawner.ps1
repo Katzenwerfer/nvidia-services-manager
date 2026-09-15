@@ -26,7 +26,7 @@ $ScheduledTaskPrincipal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType 
 # -----------------------------
 
 $ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
-$ActionScript = "$PSScriptRoot\Start-NvAppServices.ps1"
+$ActionScript = Join-Path -Path $PSScriptRoot -ChildPath 'Start-NvAppServices.ps1' -Resolve
 $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
 $ScheduledTaskAction = New-ScheduledTaskAction -Execute $ActionProcess -Argument $ActionParameters
