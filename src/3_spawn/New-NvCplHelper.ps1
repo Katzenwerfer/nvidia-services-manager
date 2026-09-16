@@ -3,7 +3,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 $TaskName = 'NVIDIA Control Panel Helper'
 $TaskPath = '\Custom\NVIDIA\'
 
-$ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+$ScheduledTask = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction 'SilentlyContinue'
 
 if ($ScheduledTask) {
     Write-Host -Object "Scheduled task '$TaskPath$TaskName' already exists. No action taken." -ForegroundColor 'Green'
