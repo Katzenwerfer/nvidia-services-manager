@@ -11,6 +11,12 @@ if (-not $Process -and -not $Overlay) {
     if ($NvContainerLS.Status -eq 'Running') {
         $NvContainerLS | Stop-Service -Force
     }
+
+    $NvOverlay = Get-Service -Name 'FvSvc'
+
+    if ($NvOverlay.Status -eq 'Running') {
+        $NvOverlay | Stop-Service -Force
+    }
 }
 
 & "$PSScriptRoot\..\2_disable\Disable-NvAppTask.ps1"
