@@ -11,3 +11,5 @@ if (-not $Process) {
         $NvDisplayContainerLS | Stop-Service -Force
     }
 }
+
+& "$PSScriptRoot\..\2_disable\Set-NvDisplayContainerLS.ps1"
