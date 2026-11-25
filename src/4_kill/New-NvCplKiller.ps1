@@ -25,7 +25,7 @@ $ScheduledTaskPrincipal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType 
 # === Scheduled Task Action ===
 # -----------------------------
 
-$ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
+$ActionProcess = (Get-Command -Name 'pwsh.exe' -All).Source | Select-Object -Last 1
 $ActionScript = Join-Path -Path $PSScriptRoot -ChildPath 'Stop-NvCplServices.ps1' -Resolve
 $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
