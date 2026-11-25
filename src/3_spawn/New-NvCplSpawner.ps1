@@ -25,7 +25,19 @@ $ScheduledTaskPrincipal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType 
 # === Scheduled Task Action ===
 # -----------------------------
 
-$ActionProcess = '"C:\Program Files\PowerShell\7\pwsh.exe"'
+$CandidatePaths = @(
+    'C:\Program Files\PowerShell\7\pwsh.exe'
+    'C:\pwsh\pwsh.exe'
+)
+
+$PwshPath = $CandidatePaths | Where-Object { Test-Path -Path $_ -PathType Leaf } | Select-Object -First 1
+
+if (-not $PwshPath) {
+    Write-Error -Message "Could not find pwsh.exe at any expected location ($($CandidatePaths -join ', '))." -ErrorAction Stop
+}
+
+$ActionProcess = "`"$PwshPath`""
+
 $ActionScript = Join-Path -Path $PSScriptRoot -ChildPath 'Start-NvCplServices.ps1' -Resolve
 $ActionParameters = "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File `"$ActionScript`""
 
